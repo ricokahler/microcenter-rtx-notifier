@@ -1,0 +1,53 @@
+org: ricokahler
+app: microcenter-rtx-notifier
+service: microcenter-rtx-notifier
+
+provider:
+  name: aws
+  runtime: nodejs14.x
+  managedPolicyArns:
+    # lol permissions
+    - 'arn:aws:iam::aws:policy/AdministratorAccess'
+  environment:
+    STORE_ID: ${param:STORE_ID}
+    PHONE_NUMBER: ${param:PHONE_NUMBER}
+    PINPOINT_APP_NAME: ${self:custom.pinpointAppName}
+    DYNAMO_TABLE_NAME: ${self:custom.dynamoTableName}
+    ORIGINATION_NUMBER: ${param:ORIGINATION_NUMBER}
+
+functions:
+  microcenter-rtx-notifier:
+    handler: src/microcenter-rtx-notifier.handler
+    events:
+      - schedule: rate(5 minutes)
+
+resources:
+  Resources:
+    DynamoTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        BillingMode: PAY_PER_REQUEST
+        TableName: ${self:custom.dynamoTableName}
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+    PinpointApplication:
+      Type: AWS::Pinpoint::App
+      Properties:
+        Name: ${self:custom.pinpointAppName}
+    PinpointSMSChannel:
+      Type: AWS::Pinpoint::SMSChannel
+      Properties:
+        ApplicationId: !Ref PinpointApplication
+        Enabled: true
+
+custom:
+  pinpointAppName: microcenter-rtx-notifier-${opt:stage, self:provider.stage}-${git:branch}
+  dynamoTableName: microcenter-rtx-notifier-${opt:stage, self:provider.stage}-${git:branch}
+
+plugins:
+  - serverless-attach-managed-policy
+  - serverless-plugin-git-variables
