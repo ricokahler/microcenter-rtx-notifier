@@ -13,3 +13,11 @@ you'll need to configure 3 things:
 - `STORE_ID` — microcenter store ID. this can be found in the URL after you select a store
 
 After a successful deploy, you'll get a text message whenever an RTX card comes back in stock. Polls every 5 minutes.
+
+---
+
+**update**: i did eventually get a graphics card but i just ended up buying a pre-built. i did buy it at microcenter though.
+
+btw: sometimes microcenter will say the card is "limited availability" on their site suggesting it's in stock at the store, but that's not always the case.
+
+GOOD LUCK
